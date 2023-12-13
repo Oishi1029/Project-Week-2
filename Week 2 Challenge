@@ -36,6 +36,12 @@ int flagB=1;
 int distanceA=0;
 int distanceB=0;
 
+//function declaration//
+void stop();
+void forward();
+void turnLeft();
+void turnRight();
+
 void setup() {                  
   // Initialize the pins as inputs and outputs.
   pinMode(EnA, OUTPUT);
@@ -55,64 +61,33 @@ void setup() {
 }
 
 void loop() {                    
-  if (digitalRead(IR1)==LOW && digitalRead(IR2)==LOW){  
-    //Stop both motors
-    analogWrite(In1, 0);
-    digitalWrite(In2, LOW);
-    digitalWrite(In3, LOW);
-    digitalWrite(In4, LOW);
-    analogWrite(EnA, 0);
-    analogWrite(EnB, 0);
-  }
 
-  else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==HIGH){ 
-    //Move both motors
-    analogWrite(In1, 255);
-    digitalWrite(In2, LOW);
-    digitalWrite(In3, HIGH); 
-    digitalWrite(In4, LOW);
-    analogWrite(EnA, 65);   
-    analogWrite(EnB, 65);   
-  }
+  //stop when detech both sensor detect black//
+  if (digitalRead(IR1)==LOW && digitalRead(IR2)==LOW) stop();
+   
+  //forward when both sensor detech white//
+  else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==HIGH) forward();
 
+  //turnRight when left sensor detect white, right sensor detect black//
   else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==LOW){
-    //Towards Right 
-    analogWrite(In1, 255);
-    digitalWrite(In2, LOW);
-    digitalWrite(In3, LOW);
-    digitalWrite(In4, HIGH);
-    analogWrite(EnA, 220);
-    analogWrite(EnB, 220);
+    turnRight();
     delay(50);
   }
 
+  //turnLeft when left sensor detect black right sensor detect white
   else if (digitalRead(IR1)==LOW && digitalRead(IR2)==HIGH){
-    //Towards Left 
-    analogWrite(In1, 0);
-    digitalWrite(In2, HIGH);
-    digitalWrite(In3, HIGH);
-    digitalWrite(In4, LOW);
-    analogWrite(EnA, 220);
-    analogWrite(EnB, 220);
+    turnLeft();
     delay(50);
   }
 
-  else{
-    //Stop both the motors
-    analogWrite(In1, 0);
-    digitalWrite(In2, LOW);
-    digitalWrite(In3, LOW);
-    digitalWrite(In4, LOW);
-    analogWrite(EnA, 0);
-    analogWrite(EnB, 0);
-  }
+  else stop();
 
   //encoder1//
   if (digitalRead(encoder1)==1 && flagA==1){ //if there is a change in signal from 0 to 1, increase counter by 1
     counter1++; 
     flagA=0;
   }
-  
+
   if (digitalRead(encoder1)==0) flagA=1;
     
 
@@ -121,7 +96,7 @@ void loop() {
     counter2++;
     flagB=0;
   }
-  
+
   if (digitalRead(encoder2)==0) flagB=1;
     
 
@@ -140,4 +115,40 @@ void loop() {
 
   return (0);
 
+}
+
+void stop(){
+  analogWrite(In1, 0);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, LOW);
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 0);
+  analogWrite(EnB, 0);
+}
+
+void forward(){
+  analogWrite(In1, 255);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, HIGH); 
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 65);   
+  analogWrite(EnB, 65); 
+}
+
+void turnRight(){
+  analogWrite(In1, 255);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, LOW);
+  digitalWrite(In4, HIGH);
+  analogWrite(EnA, 220);
+  analogWrite(EnB, 220);
+}
+
+void turnLeft(){
+  analogWrite(In1, 0);
+  digitalWrite(In2, HIGH);
+  digitalWrite(In3, HIGH);
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 220);
+  analogWrite(EnB, 220);
 }

@@ -1,0 +1,143 @@
+// include the library code:                                           
+#include <LiquidCrystal.h>
+
+const int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+int seconds = 0;
+
+int EnA = 3;
+int EnB = 11;
+
+int In1 = A4;
+int In2 = 2;
+int In3 = 12;
+int In4 = 13;
+
+int IR1 = A1; 
+int IR2 = A3;  
+
+//value can be changed anytime|number of pulses per interval
+volatile unsigned int counter1 =0;
+
+//value can be changed anytime|number of pulses per interval
+volatile unsigned int counter2 =0;
+
+int circumferenceCounter = 20;
+
+int encoder1 = A2;
+int encoder2 = A5;
+
+const float circumference = 21.3628; //wheel's circumference (cm)
+
+int flagA=1;
+int flagB=1;
+
+int distanceA=0;
+int distanceB=0;
+
+void setup() {                  
+  // Initialize the pins as inputs and outputs.
+  pinMode(EnA, OUTPUT);
+  pinMode(EnB, OUTPUT); 
+  pinMode(In1, OUTPUT);
+  pinMode(In2, OUTPUT);
+  pinMode(In3, OUTPUT);
+  pinMode(In4, OUTPUT);
+  pinMode(IR1, INPUT);
+  pinMode(IR2, INPUT);
+
+  Serial.begin(9600);
+  pinMode(encoder1,INPUT);
+  pinMode(encoder2,INPUT);
+
+  lcd.begin(16, 2);
+}
+
+void loop() {                    
+  if (digitalRead(IR1)==LOW && digitalRead(IR2)==LOW){  
+    //Stop both motors
+    analogWrite(In1, 0);
+    digitalWrite(In2, LOW);
+    digitalWrite(In3, LOW);
+    digitalWrite(In4, LOW);
+    analogWrite(EnA, 0);
+    analogWrite(EnB, 0);
+  }
+
+  else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==HIGH){ 
+    //Move both motors
+    analogWrite(In1, 255);
+    digitalWrite(In2, LOW);
+    digitalWrite(In3, HIGH); 
+    digitalWrite(In4, LOW);
+    analogWrite(EnA, 65);   
+    analogWrite(EnB, 65);   
+  }
+
+  else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==LOW){
+    //Towards Right 
+    analogWrite(In1, 255);
+    digitalWrite(In2, LOW);
+    digitalWrite(In3, LOW);
+    digitalWrite(In4, HIGH);
+    analogWrite(EnA, 220);
+    analogWrite(EnB, 220);
+    delay(50);
+  }
+
+  else if (digitalRead(IR1)==LOW && digitalRead(IR2)==HIGH){
+    //Towards Left 
+    analogWrite(In1, 0);
+    digitalWrite(In2, HIGH);
+    digitalWrite(In3, HIGH);
+    digitalWrite(In4, LOW);
+    analogWrite(EnA, 220);
+    analogWrite(EnB, 220);
+    delay(50);
+  }
+
+  else{
+    //Stop both the motors
+    analogWrite(In1, 0);
+    digitalWrite(In2, LOW);
+    digitalWrite(In3, LOW);
+    digitalWrite(In4, LOW);
+    analogWrite(EnA, 0);
+    analogWrite(EnB, 0);
+  }
+
+  //encoder1//
+  if (digitalRead(encoder1)==1 && flagA==1){ //if there is a change in signal from 0 to 1, increase counter by 1
+    counter1++; 
+    flagA=0;
+  }
+  
+  if (digitalRead(encoder1)==0) flagA=1;
+    
+
+  //encoder2//
+  if (digitalRead(encoder2)==1 && flagB==1){ //if there is a change in signal from 0 to 1, increase counter by 1
+    counter2++;
+    flagB=0;
+  }
+  
+  if (digitalRead(encoder2)==0) flagB=1;
+    
+
+  //calculate distance traval by left wheel//
+  distanceA=(counter1/circumferenceCounter)*circumference;
+
+  //calculate distance travel by right wheel//
+  distanceB=(counter2/circumferenceCounter)*circumference;
+
+  //display distance travelled//
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Distance:");
+  lcd.print((distanceA+distanceB)/2);
+  lcd.print("cm"); 
+
+  return (0);
+
+}

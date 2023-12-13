@@ -1,0 +1,99 @@
+// include the library code:                                           
+#include <LiquidCrystal.h>
+
+const int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+int EnA = 3;
+int EnB = 11;
+
+int In1 = A4;
+int In2 = 2;
+int In3 = 12;
+int In4 = 13;
+
+int IR1 = A1; 
+int IR2 = A3;  
+
+//function declaration//
+void stop();
+void forward();
+void turnLeft();
+void turnRight();
+
+void setup() {                  
+  // Initialize the pins as inputs and outputs.
+  pinMode(EnA, OUTPUT);
+  pinMode(EnB, OUTPUT); 
+  pinMode(In1, OUTPUT);
+  pinMode(In2, OUTPUT);
+  pinMode(In3, OUTPUT);
+  pinMode(In4, OUTPUT);
+  pinMode(IR1, INPUT);
+  pinMode(IR2, INPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() {                
+
+  //stop when detech both sensor detect black//
+  if (digitalRead(IR1)==LOW && digitalRead(IR2)==LOW) stop();
+   
+  //forward when both sensor detech white//
+  else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==HIGH) forward();
+
+  //turnRight when left sensor detect white, right sensor detect black//
+  else if (digitalRead(IR1)==HIGH && digitalRead(IR2)==LOW){
+    turnRight();
+    delay(50);
+  }
+
+  //turnLeft when left sensor detect black right sensor detect white
+  else if (digitalRead(IR1)==LOW && digitalRead(IR2)==HIGH){
+    turnLeft();
+    delay(50);
+  }
+
+  else stop();
+
+  
+  return (0);
+
+}
+
+void stop(){
+  analogWrite(In1, 0);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, LOW);
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 0);
+  analogWrite(EnB, 0);
+}
+
+void forward(){
+  analogWrite(In1, 255);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, HIGH); 
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 65);   
+  analogWrite(EnB, 65); 
+}
+
+void turnRight(){
+  analogWrite(In1, 255);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, LOW);
+  digitalWrite(In4, HIGH);
+  analogWrite(EnA, 220);
+  analogWrite(EnB, 220);
+}
+
+void turnLeft(){
+  analogWrite(In1, 0);
+  digitalWrite(In2, HIGH);
+  digitalWrite(In3, HIGH);
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 220);
+  analogWrite(EnB, 220);
+}

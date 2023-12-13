@@ -32,6 +32,7 @@ const float circumference = 21.3628; //wheel's circumference (cm)
 
 int flagA=1;
 int flagB=1;
+int boostFlag=1;
 
 int distanceA=0;
 int distanceB=0;
@@ -60,7 +61,13 @@ void setup() {
   lcd.begin(16, 2);
 }
 
-void loop() {                    
+void loop() {                
+
+  if (boostFlag == 1){
+    boost();
+    delay(250);
+    boostFlag=0;
+  }    
 
   //stop when detech both sensor detect black//
   if (digitalRead(IR1)==LOW && digitalRead(IR2)==LOW) stop();
@@ -151,4 +158,13 @@ void turnLeft(){
   digitalWrite(In4, LOW);
   analogWrite(EnA, 220);
   analogWrite(EnB, 220);
+}
+
+void boost(){
+  analogWrite(In1, 255);
+  digitalWrite(In2, LOW);
+  digitalWrite(In3, HIGH); 
+  digitalWrite(In4, LOW);
+  analogWrite(EnA, 200);   
+  analogWrite(EnB, 200); 
 }

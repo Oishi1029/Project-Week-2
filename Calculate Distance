@@ -1,0 +1,79 @@
+// include the library code:                                           
+#include <LiquidCrystal.h>
+
+const int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+//value can be changed anytime|number of pulses per interval
+volatile unsigned int counter1 =0;
+
+//value can be changed anytime|number of pulses per interval
+volatile unsigned int counter2 =0;
+
+int encoder1 = A2;
+int encoder2 = A5;
+
+const float circumference = 21.3628; //wheel's circumference (cm)
+int circumferenceCounter = 20; //the number of counter per circumference 
+
+int flagA=1;
+int flagB=1;
+
+int distanceA=0;
+int distanceB=0;
+
+//function declaration//
+void stop();
+void forward();
+void turnLeft();
+void turnRight();
+
+void setup() {                  
+  // Initialize the pins as inputs and outputs.
+
+  Serial.begin(9600);
+  pinMode(encoder1,INPUT);
+  pinMode(encoder2,INPUT);
+  lcd.begin(16, 2);
+}
+
+void loop() {                
+
+  //encoder1//
+  if (digitalRead(encoder1)==1 && flagA==1){ //if there is a change in signal from 0 to 1, increase counter by 1
+    counter1++; 
+    flagA=0;
+  }
+
+  if (digitalRead(encoder1)==0) flagA=1;
+    
+
+  //encoder2//
+  if (digitalRead(encoder2)==1 && flagB==1){ //if there is a change in signal from 0 to 1, increase counter by 1
+    counter2++;
+    flagB=0;
+  }
+
+  if (digitalRead(encoder2)==0) flagB=1;
+    
+
+  //calculate distance traval by left wheel//
+  distanceA=(counter1/circumferenceCounter)*circumference;
+
+  //calculate distance travel by right wheel//
+  distanceB=(counter2/circumferenceCounter)*circumference;
+
+  //display distance travelled//
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Distance:");
+  lcd.print((distanceA+distanceB)/2);
+  lcd.print("cm"); 
+
+  //Serial print distance travelled//
+  Serial.print("Distance: ");
+  Serial.println((distanceA+distanceB)/2);
+
+  return (0);
+
+}
